@@ -34,6 +34,10 @@ public class Controller : MonoBehaviour
 {
 	public Transform rod1;
 	public Transform rod2;
+
+	public FixedScale bob1;
+	public FixedScale bob2;
+
 	public double g = 9.81;
 
 	private double l1;
@@ -54,13 +58,13 @@ public class Controller : MonoBehaviour
 	{
 		Application.targetFrameRate = rate;
 		dt = 1 / (double)rate / n;
-		m1 = 1.0;
-		m2 = 1.0;
+
 		t1 = rod1.rotation.eulerAngles.z * Mathf.Deg2Rad;
 		t2 = (rod2.rotation.eulerAngles.z) * Mathf.Deg2Rad;
 		w1 = 0.0;
 		w2 = 0.0;
 		UpdateScale();
+		UpdateMass();
 	}
 
 	array4 getABs(array4 para)
@@ -130,11 +134,15 @@ public class Controller : MonoBehaviour
 		l2 = rod2.localScale.y;
 	}
 
+	public void UpdateMass()
+	{
+		m1 = bob1.actualVal;
+		m2 = bob2.actualVal;
+	}
+	double mt = 0;
 	void Update()
 	{
-	//Call Update Scale when changing the length
 		dt = 1 / (double)rate / n;
-
 
 		for (int i = 0; i < n; i++)
 		{
@@ -143,7 +151,9 @@ public class Controller : MonoBehaviour
 			t2 += R.a2;
 			w1 += R.a3;
 			w2 += R.a4;
+			mt = Math.Max(t1, mt);
 		}
+		Debug.Log(mt);
 		rod1.rotation = Quaternion.Euler(0, 0, (float)t1 * Mathf.Rad2Deg);
 		rod2.rotation = Quaternion.Euler(0, 0, (float)t2 * Mathf.Rad2Deg);
 	}

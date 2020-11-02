@@ -7,6 +7,7 @@ public class FixedScale : MonoBehaviour
 {
 
     public float FixeScale = 1;
+    public float actualVal = 1;
     public GameObject parent;
 
     // Update is called once per frame
