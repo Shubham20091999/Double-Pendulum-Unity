@@ -35,7 +35,6 @@ public class Controller : MonoBehaviour
 	public Transform rod1;
 	public Transform rod2;
 	public double g = 9.81;
-	public Text text;
 
 	private double l1;
 	private double l2;
@@ -47,25 +46,21 @@ public class Controller : MonoBehaviour
 	private double w1;
 	private double w2;
 
-	private double tot = 0.0;
-	private double sum = 0.0;
-
-	int rate = 100;
+	int rate = 24;
 	double dt;
+
+	public int n = 10;
 	void Start()
 	{
 		Application.targetFrameRate = rate;
-		dt = 1 / (double)rate;
-		l1 = rod1.localScale.y;
-		l2 = rod2.localScale.y;
+		dt = 1 / (double)rate / n;
 		m1 = 1.0;
 		m2 = 1.0;
 		t1 = rod1.rotation.eulerAngles.z * Mathf.Deg2Rad;
 		t2 = (rod2.rotation.eulerAngles.z) * Mathf.Deg2Rad;
 		w1 = 0.0;
 		w2 = 0.0;
-
-		tot = PotentialEnergy() + KineticEnergy();
+		UpdateScale();
 	}
 
 	array4 getABs(array4 para)
@@ -129,18 +124,26 @@ public class Controller : MonoBehaviour
 		return new array4(dt1, dt2, dw1, dw2);
 	}
 
+	public void UpdateScale()
+	{
+		l1 = rod1.localScale.y;
+		l2 = rod2.localScale.y;
+	}
+
 	void Update()
 	{
-		sum = PotentialEnergy() + KineticEnergy();
-		text.text = (1 / Time.deltaTime).ToString() + " - " + (sum - tot).ToString();
-		Debug.Log(sum - tot);
+	//Call Update Scale when changing the length
+		dt = 1 / (double)rate / n;
 
-		array4 R = getNxtRangKutta(new array4(t1, t2, w1, w2));
-		t1 += R.a1;
-		t2 += R.a2;
-		w1 += R.a3;
-		w2 += R.a4;
 
+		for (int i = 0; i < n; i++)
+		{
+			array4 R = getNxtRangKutta(new array4(t1, t2, w1, w2));
+			t1 += R.a1;
+			t2 += R.a2;
+			w1 += R.a3;
+			w2 += R.a4;
+		}
 		rod1.rotation = Quaternion.Euler(0, 0, (float)t1 * Mathf.Rad2Deg);
 		rod2.rotation = Quaternion.Euler(0, 0, (float)t2 * Mathf.Rad2Deg);
 	}
