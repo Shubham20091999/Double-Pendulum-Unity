@@ -54,6 +54,7 @@ public class Controller : MonoBehaviour
 	double dt;
 
 	public int n = 10;
+
 	void Start()
 	{
 		Application.targetFrameRate = rate;
@@ -139,6 +140,7 @@ public class Controller : MonoBehaviour
 		m1 = bob1.actualVal;
 		m2 = bob2.actualVal;
 	}
+
 	double mt = 0;
 	void Update()
 	{
@@ -153,8 +155,33 @@ public class Controller : MonoBehaviour
 			w2 += R.a4;
 			mt = Math.Max(t1, mt);
 		}
-		Debug.Log(mt);
 		rod1.rotation = Quaternion.Euler(0, 0, (float)t1 * Mathf.Rad2Deg);
 		rod2.rotation = Quaternion.Euler(0, 0, (float)t2 * Mathf.Rad2Deg);
 	}
+
+	public void updateTheta1(string t)
+	{
+		float d = float.Parse(t) % (360);
+		t1 = d * Mathf.Deg2Rad;
+		rod1.rotation = Quaternion.Euler(0, 0, d);
+	}
+
+	public void updateTheta2(string t)
+	{
+		float d = float.Parse(t) % (360);
+		t2 = d * Mathf.Deg2Rad;
+		rod2.rotation = Quaternion.Euler(0, 0, d);
+	}
+
+	public void updateOmega1(string t)
+	{
+		w1 = double.Parse(t);
+	}
+
+	public void updateOmega2(string t)
+	{
+		w2 = double.Parse(t);
+	}
+
+
 }
