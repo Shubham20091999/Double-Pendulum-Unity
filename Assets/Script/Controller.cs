@@ -1,7 +1,5 @@
 ﻿using System;
 using UnityEngine;
-using UnityEngine.UI;
-
 
 public class array4
 {
@@ -32,40 +30,36 @@ public class array4
 
 public class Controller : MonoBehaviour
 {
+	public Setup setup;
 	public Transform rod1;
 	public Transform rod2;
 
 	public FixedScale bob1;
 	public FixedScale bob2;
 
-	public double g = 9.81;
-
 	private double l1;
 	private double l2;
-	private double m1;
-	private double m2;
+	public double m1;
+	public double m2;
 
 	private double t1;
 	private double t2;
 	private double w1;
 	private double w2;
 
-	int rate = 24;
-	double dt;
+	private double tot;
 
-	public int n = 10;
 
 	void Start()
 	{
-		Application.targetFrameRate = rate;
-		dt = 1 / (double)rate / n;
-
 		t1 = rod1.rotation.eulerAngles.z * Mathf.Deg2Rad;
 		t2 = (rod2.rotation.eulerAngles.z) * Mathf.Deg2Rad;
 		w1 = 0.0;
 		w2 = 0.0;
 		UpdateScale();
 		UpdateMass();
+
+		tot = KineticEnergy() + PotentialEnergy();
 	}
 
 	array4 getABs(array4 para)
@@ -78,8 +72,8 @@ public class Controller : MonoBehaviour
 		double A1 = l2 / l1 * (m2 / (m1 + m2)) * Math.Cos(t1d - t2d);
 		double A2 = l1 / l2 * Math.Cos(t1d - t2d);
 
-		double B1 = -l2 / l1 * Math.Pow(w2d, 2.0) * (m2 / (m1 + m2)) * Math.Sin(t1d - t2d) - g / l1 * Math.Sin(t1d);
-		double B2 = l1 / l2 * Math.Pow(w1d, 2.0) * Math.Sin(t1d - t2d) - g / l2 * Math.Sin(t2d);
+		double B1 = -l2 / l1 * Math.Pow(w2d, 2.0) * (m2 / (m1 + m2)) * Math.Sin(t1d - t2d) - setup.g / l1 * Math.Sin(t1d);
+		double B2 = l1 / l2 * Math.Pow(w1d, 2.0) * Math.Sin(t1d - t2d) - setup.g / l2 * Math.Sin(t2d);
 
 		return new array4(A1, A2, B1, B2);
 	}
@@ -102,17 +96,17 @@ public class Controller : MonoBehaviour
 
 	double PotentialEnergy()
 	{
-		return -(m1 + m2) * g * l1 * Math.Cos(t1) - m2 * g * l2 * Math.Cos(t2);
+		return -(m1 + m2) * setup.g * l1 * Math.Cos(t1) - m2 * setup.g * l2 * Math.Cos(t2);
 	}
 
 	array4 getNxtRangKutta(array4 y)
 	{
 		array4 k1 = getDummy(y);
-		array4 k2 = getDummy(y + k1 * (double)(dt / 2.0));
-		array4 k3 = getDummy(y + k2 * (double)(dt / 2.0));
-		array4 k4 = getDummy(y + k3 * (double)dt);
+		array4 k2 = getDummy(y + k1 * (double)(setup.dt / 2.0));
+		array4 k3 = getDummy(y + k2 * (double)(setup.dt / 2.0));
+		array4 k4 = getDummy(y + k3 * (double)setup.dt);
 
-		return (k1 + k2 * 2.0 + k3 * 2.0 + k4) * (dt / 6.0);
+		return (k1 + k2 * 2.0 + k3 * 2.0 + k4) * (setup.dt / 6.0);
 	}
 
 	array4 getNxtNaive(array4 y)
@@ -122,10 +116,10 @@ public class Controller : MonoBehaviour
 		double g2 = vs.a4;
 		double w1 = vs.a1;
 		double w2 = vs.a2;
-		double dw1 = g1 * dt;
-		double dw2 = g2 * dt;
-		double dt1 = dt * (w1 + dw1 / 2.0);
-		double dt2 = dt * (w2 + dw2 / 2.0);
+		double dw1 = g1 * setup.dt;
+		double dw2 = g2 * setup.dt;
+		double dt1 = setup.dt * (w1 + dw1 / 2.0);
+		double dt2 = setup.dt * (w2 + dw2 / 2.0);
 		return new array4(dt1, dt2, dw1, dw2);
 	}
 
@@ -141,19 +135,19 @@ public class Controller : MonoBehaviour
 		m2 = bob2.actualVal;
 	}
 
-	double mt = 0;
 	void Update()
 	{
-		dt = 1 / (double)rate / n;
-
-		for (int i = 0; i < n; i++)
+		if (!setup.bool_Paused)
 		{
-			array4 R = getNxtRangKutta(new array4(t1, t2, w1, w2));
-			t1 += R.a1;
-			t2 += R.a2;
-			w1 += R.a3;
-			w2 += R.a4;
-			mt = Math.Max(t1, mt);
+			for (int i = 0; i < setup.n; i++)
+			{
+				array4 R = getNxtRangKutta(new array4(t1, t2, w1, w2));
+				t1 += R.a1;
+				t2 += R.a2;
+				w1 += R.a3;
+				w2 += R.a4;
+			}
+			Debug.Log(KineticEnergy() + PotentialEnergy() - tot);
 		}
 		rod1.rotation = Quaternion.Euler(0, 0, (float)t1 * Mathf.Rad2Deg);
 		rod2.rotation = Quaternion.Euler(0, 0, (float)t2 * Mathf.Rad2Deg);
@@ -182,6 +176,4 @@ public class Controller : MonoBehaviour
 	{
 		w2 = double.Parse(t);
 	}
-
-
 }
