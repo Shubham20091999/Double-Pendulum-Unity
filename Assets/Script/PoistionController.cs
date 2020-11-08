@@ -1,13 +1,12 @@
 ﻿using UnityEngine;
 
 [ExecuteInEditMode]
-public class Poistion : MonoBehaviour
+public class PoistionController : MonoBehaviour
 {
     public Transform fromPostion;
 
     void LateUpdate()
     {
         transform.position = fromPostion.position;
-
     }
 }
