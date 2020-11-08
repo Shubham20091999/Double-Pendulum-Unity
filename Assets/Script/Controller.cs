@@ -127,6 +127,11 @@ public class Controller : MonoBehaviour
 			}
 			/*Debug.Log(KineticEnergy() + PotentialEnergy() - tot);*/
 		}
+		else
+		{
+			w1 = 0;
+			w2 = 0;
+		}
 		rod1.rotation = Quaternion.Euler(0, 0, (float)t1 * Mathf.Rad2Deg);
 		rod2.rotation = Quaternion.Euler(0, 0, (float)t2 * Mathf.Rad2Deg);
 	}

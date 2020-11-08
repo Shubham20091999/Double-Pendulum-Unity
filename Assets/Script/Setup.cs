@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -36,16 +37,22 @@ public class Setup : MonoBehaviour
 	public InputField length2Input;
 	public InputField weight1Input;
 	public InputField weight2Input;
+	public Slider delta1Slider;
+	public Text delta1Text;
+	public Slider delta2Slider;
+	public Text delta2Text;
+
 
 	int rate = 24;
 
 	[HideInInspector]
 	public double dt;
 	[HideInInspector]
-	public bool bool_Paused = false;
+	public bool bool_Paused = true;
 
 	public List<Configuration> configs;
 
+	public List<DeltaController> dconfigs;
 	public void Start()
 	{
 		Application.targetFrameRate = rate;
@@ -56,6 +63,7 @@ public class Setup : MonoBehaviour
 		l2 = 1;
 		st1 = 180;
 		st2 = 180;
+		bool_Paused = true;
 	}
 
 	public void pause()
@@ -63,11 +71,11 @@ public class Setup : MonoBehaviour
 		bool_Paused = !bool_Paused;
 		if (bool_Paused)
 		{
-			play_pause.sprite = paused;
+			play_pause.sprite = playing;
 		}
 		else
 		{
-			play_pause.sprite = playing;
+			play_pause.sprite = paused;
 		}
 	}
 
@@ -192,6 +200,24 @@ public class Setup : MonoBehaviour
 		foreach (Configuration c in configs)
 		{
 			c.controller.w2 = sw2;
+		}
+	}
+
+	public void UpdateDelta1(float v)
+	{
+		delta1Text.text = Math.Round(delta1Slider.value, 3).ToString();
+		foreach (DeltaController d in dconfigs)
+		{
+			d.updateT1(v);
+		}
+	}
+
+	public void UpdateDelta2(float v)
+	{
+		delta2Text.text = Math.Round(delta2Slider.value, 3).ToString();
+		foreach (DeltaController d in dconfigs)
+		{
+			d.updateT2(v);
 		}
 	}
 }
