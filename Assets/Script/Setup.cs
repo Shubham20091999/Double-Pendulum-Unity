@@ -12,7 +12,12 @@ public class Setup : MonoBehaviour
 	int rate = 24;
 	public double dt;
 
-	private void Start()
+	protected double l1;
+	protected double l2;
+	protected double m1;
+	protected double m2;
+
+	public virtual void Start()
 	{
 		Application.targetFrameRate = rate;
 		dt = 1 / (double)rate / n;
