@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class array4
 {
@@ -43,6 +44,7 @@ public class Controller : MonoBehaviour
 	[HideInInspector]
 	public double w2;
 
+
 	/*double tot;*/
 	public virtual void Start()
 	{
@@ -77,14 +79,14 @@ public class Controller : MonoBehaviour
 		return new array4(para.a3, para.a4, g1, g2);
 	}
 
-	double KineticEnergy()
+	public double KineticEnergy()
 	{
 		double ke1 = 0.5 * setup.m1 * Math.Pow(setup.l1 * w1, 2.0) + setup.m2 * setup.l1 * setup.l2 * w1 * w2 * Math.Cos(t1 - t2);
 		double ke2 = 0.5 * setup.m2 * (Math.Pow(setup.l1 * w1, 2.0) + Math.Pow(setup.l2 * w2, 2.0));
 		return ke1 + ke2;
 	}
 
-	double PotentialEnergy()
+	public double PotentialEnergy()
 	{
 		return -(setup.m1 + setup.m2) * setup.g * setup.l1 * Math.Cos(t1) - setup.m2 * setup.g * setup.l2 * Math.Cos(t2);
 	}
@@ -125,12 +127,6 @@ public class Controller : MonoBehaviour
 				w1 += R.a3;
 				w2 += R.a4;
 			}
-			/*Debug.Log(KineticEnergy() + PotentialEnergy() - tot);*/
-		}
-		else
-		{
-			w1 = 0;
-			w2 = 0;
 		}
 		rod1.rotation = Quaternion.Euler(0, 0, (float)t1 * Mathf.Rad2Deg);
 		rod2.rotation = Quaternion.Euler(0, 0, (float)t2 * Mathf.Rad2Deg);

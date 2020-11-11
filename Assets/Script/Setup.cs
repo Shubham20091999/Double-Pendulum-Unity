@@ -53,8 +53,14 @@ public class Setup : MonoBehaviour
 	public List<Configuration> configs;
 
 	public List<DeltaController> dconfigs;
-	public void Start()
+
+	public Text initialEnergy;
+	public Text energyDifference;
+	double totalEnergy;
+
+	private void Awake()
 	{
+		QualitySettings.vSyncCount = 0;
 		Application.targetFrameRate = rate;
 		dt = 1 / (double)rate / n;
 		m1 = 1;
@@ -64,6 +70,16 @@ public class Setup : MonoBehaviour
 		st1 = 180;
 		st2 = 180;
 		bool_Paused = true;
+	}
+
+	void UpdateTotalEnergy()
+	{
+		totalEnergy = configs[0].controller.KineticEnergy() + configs[0].controller.PotentialEnergy();
+		initialEnergy.text = "Initial: " + Math.Round(totalEnergy, 6).ToString();
+	}
+	public void Start()
+	{
+		UpdateTotalEnergy();
 	}
 
 	public void pause()
@@ -91,7 +107,24 @@ public class Setup : MonoBehaviour
 			return newlen;
 		}
 	}
+	public void reset()
+	{
+		if(!bool_Paused)
+			pause();
+		foreach (Configuration c in configs)
+		{
+			c.controller.w1 = sw1 * Mathf.Deg2Rad;
+			c.controller.w2 = sw2 * Mathf.Deg2Rad;
+			c.controller.t1 = st1 * Mathf.Deg2Rad;
+			c.controller.t2 = st2 * Mathf.Deg2Rad;
+		}
 
+		foreach (DeltaController d in dconfigs)
+		{
+			d.t1 += d.dt1;
+			d.t2 += d.dt2;
+		}
+	}
 	public void updateL1(string s)
 	{
 		double templ1 = UpdateValue(double.Parse(s), l1);
@@ -104,6 +137,7 @@ public class Setup : MonoBehaviour
 				c.rod1.localScale = new Vector3(1, (float)l1, 1);
 				c.bob1.localScale = new Vector3(1, 1 / (float)l1, 1);
 			}
+			UpdateTotalEnergy();
 		}
 		else
 		{
@@ -124,6 +158,7 @@ public class Setup : MonoBehaviour
 				c.rod2.localScale = new Vector3(1, (float)l2, 1);
 				c.bob2.localScale = new Vector3(1, 1 / (float)l2, 1);
 			}
+			UpdateTotalEnergy();
 		}
 		else
 		{
@@ -138,6 +173,7 @@ public class Setup : MonoBehaviour
 		if (tempm1 != m1)
 		{
 			m1 = tempm1;
+			UpdateTotalEnergy();
 		}
 		else
 		{
@@ -152,35 +188,40 @@ public class Setup : MonoBehaviour
 		if (tempm2 != m2)
 		{
 			m2 = tempm2;
+			UpdateTotalEnergy();
 		}
 		else
 		{
 			weight2Input.text = m2.ToString();
+
 		}
+
 	}
 
 	public void UpdateST1(string t)
 	{
 		float d = float.Parse(t) % (360);
-		st1 = d * Mathf.Deg2Rad;
+		st1 = d;
 
 		foreach (Configuration c in configs)
 		{
 			c.rod1.rotation = Quaternion.Euler(0, 0, d);
-			c.controller.t1 = st1;
+			c.controller.t1 = st1 * Mathf.Deg2Rad;
 		}
+		UpdateTotalEnergy();
 	}
 
 	public void UpdateST2(string t)
 	{
 		float d = float.Parse(t) % (360);
-		st2 = d * Mathf.Deg2Rad;
+		st2 = d;
 
 		foreach (Configuration c in configs)
 		{
 			c.rod2.rotation = Quaternion.Euler(0, 0, d);
-			c.controller.t2 = st2;
+			c.controller.t2 = st2 * Mathf.Deg2Rad;
 		}
+		UpdateTotalEnergy();
 	}
 
 	public void UpdateSW1(string t)
@@ -191,6 +232,7 @@ public class Setup : MonoBehaviour
 		{
 			c.controller.w1 = sw1;
 		}
+		UpdateTotalEnergy();
 	}
 
 	public void UpdateSW2(string t)
@@ -201,6 +243,7 @@ public class Setup : MonoBehaviour
 		{
 			c.controller.w2 = sw2;
 		}
+		UpdateTotalEnergy();
 	}
 
 	public void UpdateDelta1(float v)
@@ -219,5 +262,10 @@ public class Setup : MonoBehaviour
 		{
 			d.updateT2(v);
 		}
+	}
+
+	private void Update()
+	{
+		energyDifference.text = "Current Difference: " + Math.Round(configs[0].controller.KineticEnergy() + configs[0].controller.PotentialEnergy() - totalEnergy,6).ToString();
 	}
 }
