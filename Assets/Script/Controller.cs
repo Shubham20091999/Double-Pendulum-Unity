@@ -119,7 +119,7 @@ public class Controller : MonoBehaviour
 	{
 		if (!setup.bool_Paused)
 		{
-			for (int i = 0; i < setup.n; i++)
+			for (int i = 0; i < setup.steps; i++)
 			{
 				array4 R = getNxtRangKutta(new array4(t1, t2, w1, w2));
 				t1 += R.a1;

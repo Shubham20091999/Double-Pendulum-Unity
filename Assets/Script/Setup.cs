@@ -6,7 +6,11 @@ using UnityEngine.UI;
 public class Setup : MonoBehaviour
 {
 	public double g = 9.81;
-	public double n = 10;
+
+	[HideInInspector]
+	public int steps = 1;
+	double rate = 1;
+	int frameRate = 24;
 
 	[HideInInspector]
 	public double l1 = 1.0;
@@ -28,41 +32,53 @@ public class Setup : MonoBehaviour
 	[HideInInspector]
 	public double sw2;
 
+	[Header("Play Pause Settings")]
 	public Sprite paused;
 	public Sprite playing;
 	public Image play_pause;
 
-
+	[Header("Const. Input Settings")]
 	public InputField length1Input;
 	public InputField length2Input;
 	public InputField weight1Input;
 	public InputField weight2Input;
+
+	[Header("Delta Settings")]
 	public Slider delta1Slider;
 	public Text delta1Text;
 	public Slider delta2Slider;
 	public Text delta2Text;
 
+	[Header("Rate Settings")]
+	public InputField rateInput;
+	public InputField stepInput;
 
-	int rate = 24;
 
 	[HideInInspector]
 	public double dt;
 	[HideInInspector]
 	public bool bool_Paused = true;
 
+	[Header("Configurations")]
 	public List<Configuration> configs;
-
 	public List<DeltaController> dconfigs;
 
+	[Header("Energy Text")]
 	public Text initialEnergy;
 	public Text energyDifference;
 	double totalEnergy;
 
+	[Header("Pendulum")]
+	public GameObject DeltaPendulum;
+
 	private void Awake()
 	{
+		steps = 1;
+		rate = 1;
+
 		QualitySettings.vSyncCount = 0;
-		Application.targetFrameRate = rate;
-		dt = 1 / (double)rate / n;
+		Application.targetFrameRate = frameRate;
+		dt = (1 / (double)frameRate / steps) * rate;
 		m1 = 1;
 		m2 = 1;
 		l1 = 1;
@@ -72,6 +88,36 @@ public class Setup : MonoBehaviour
 		bool_Paused = true;
 	}
 
+	public void updateRate(string r)
+	{
+		double d = double.Parse(r);
+		if (d <= 0)
+		{
+			rateInput.text = rate.ToString();
+		}
+		else
+		{
+			rate = d;
+			dt = (1 / (double)frameRate / steps) * rate;
+		}
+	}
+
+	public void updateSteps(string r)
+	{
+		int d = int.Parse(r);
+		if (d <= 0)
+		{
+			stepInput.text = rate.ToString();
+		}
+		else
+		{
+			steps = d;
+			dt = (1 / (double)frameRate / steps) * rate;
+		}
+	}
+
+
+
 	void UpdateTotalEnergy()
 	{
 		totalEnergy = configs[0].controller.KineticEnergy() + configs[0].controller.PotentialEnergy();
@@ -80,6 +126,15 @@ public class Setup : MonoBehaviour
 	public void Start()
 	{
 		UpdateTotalEnergy();
+	}
+
+	public void HideDelta(bool b)
+	{
+		DeltaPendulum.SetActive(b);
+		delta1Slider.gameObject.SetActive(b);
+		delta2Slider.gameObject.SetActive(b);
+		delta1Text.gameObject.SetActive(b);
+		delta2Text.gameObject.SetActive(b);
 	}
 
 	public void pause()
@@ -109,7 +164,7 @@ public class Setup : MonoBehaviour
 	}
 	public void reset()
 	{
-		if(!bool_Paused)
+		if (!bool_Paused)
 			pause();
 		foreach (Configuration c in configs)
 		{
@@ -205,8 +260,13 @@ public class Setup : MonoBehaviour
 
 		foreach (Configuration c in configs)
 		{
-			c.rod1.rotation = Quaternion.Euler(0, 0, d);
 			c.controller.t1 = st1 * Mathf.Deg2Rad;
+			c.controller.w1 = sw1;
+			c.controller.w2 = sw2;
+		}
+		foreach (DeltaController delta in dconfigs)
+		{
+			delta.t1 += delta.dt1;
 		}
 		UpdateTotalEnergy();
 	}
@@ -218,9 +278,15 @@ public class Setup : MonoBehaviour
 
 		foreach (Configuration c in configs)
 		{
-			c.rod2.rotation = Quaternion.Euler(0, 0, d);
 			c.controller.t2 = st2 * Mathf.Deg2Rad;
+			c.controller.w1 = sw1;
+			c.controller.w2 = sw2;
 		}
+		foreach (DeltaController delta in dconfigs)
+		{
+			delta.t2 += delta.dt2;
+		}
+
 		UpdateTotalEnergy();
 	}
 
@@ -266,6 +332,6 @@ public class Setup : MonoBehaviour
 
 	private void Update()
 	{
-		energyDifference.text = "Current Difference: " + Math.Round(configs[0].controller.KineticEnergy() + configs[0].controller.PotentialEnergy() - totalEnergy,6).ToString();
+		energyDifference.text = "Current Difference: " + Math.Round(configs[0].controller.KineticEnergy() + configs[0].controller.PotentialEnergy() - totalEnergy, 6).ToString();
 	}
 }
