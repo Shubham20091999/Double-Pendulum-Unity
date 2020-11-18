@@ -1,10 +1,11 @@
 ![Image](Gallery/1.png?raw=true "Title")
 
 Note:    
-Approximation is done using Runge-Kutta Method
+Approximation is done using Runge-Kutta Method   
 Delta Pendulum refers to the pendulum with small change in initial angles
 *   To visualize the difference in position of two pendulums depending on different initial values of the angles
-*   It is colored pink
+*   It is colored pink   
+
 Default Pendulum refers to the other pendulum
 *   It is colored blue
 
