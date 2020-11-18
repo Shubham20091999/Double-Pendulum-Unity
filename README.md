@@ -1,6 +1,7 @@
 ![Image](Gallery/1.png?raw=true "Title")
 
 Note:    
+Unity Version used is 2019.4.12f1    
 Approximation is done using Runge-Kutta Method   
 Delta Pendulum refers to the pendulum with small change in initial angles
 *   To visualize the difference in position of two pendulums depending on different initial values of the angles
