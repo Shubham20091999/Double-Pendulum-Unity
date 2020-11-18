@@ -1,6 +1,5 @@
 ﻿using System;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class array4
 {
@@ -91,7 +90,7 @@ public class Controller : MonoBehaviour
 		return -(setup.m1 + setup.m2) * setup.g * setup.l1 * Math.Cos(t1) - setup.m2 * setup.g * setup.l2 * Math.Cos(t2);
 	}
 
-	array4 getNxtRangKutta(array4 y)
+	array4 getNxtRungeKutta(array4 y)
 	{
 		array4 k1 = getDummy(y);
 		array4 k2 = getDummy(y + k1 * (double)(setup.dt / 2.0));
@@ -121,7 +120,7 @@ public class Controller : MonoBehaviour
 		{
 			for (int i = 0; i < setup.steps; i++)
 			{
-				array4 R = getNxtRangKutta(new array4(t1, t2, w1, w2));
+				array4 R = getNxtRungeKutta(new array4(t1, t2, w1, w2));
 				t1 += R.a1;
 				t2 += R.a2;
 				w1 += R.a3;

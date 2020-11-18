@@ -91,7 +91,7 @@ public class Setup : MonoBehaviour
 	public void updateRate(string r)
 	{
 		double d = double.Parse(r);
-		if (d <= 0)
+		if (d <= 0.00001 || d>2)
 		{
 			rateInput.text = rate.ToString();
 		}
@@ -105,7 +105,7 @@ public class Setup : MonoBehaviour
 	public void updateSteps(string r)
 	{
 		int d = int.Parse(r);
-		if (d <= 0)
+		if (d <= 0.00001)
 		{
 			stepInput.text = rate.ToString();
 		}
